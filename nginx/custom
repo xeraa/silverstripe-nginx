@@ -1,0 +1,100 @@
+server {
+    root /var/www/silverstripe-nginx;
+    server_name localhost;
+
+
+		error_page 404 /assets/error-404.html;
+		error_page 500 /assets/error-500.html;
+
+		location / {
+		    try_files $uri @silverstripe;
+		}
+
+		location @silverstripe {
+		    fastcgi_keep_conn on;
+		    fastcgi_split_path_info ^(.+\.php)(/.+)$;
+		    fastcgi_pass unix:/var/run/php5-fpm.sock;
+		    fastcgi_index index.php;
+        include fastcgi_params;
+		    fastcgi_read_timeout 120;
+		    fastcgi_connect_timeout 60;
+		    fastcgi_send_timeout 120;
+		    fastcgi_buffer_size 64k;
+		    fastcgi_buffers 4 65k;
+		    fastcgi_busy_buffers_size 128k;
+
+		    fastcgi_param SCRIPT_FILENAME $document_root/framework/main.php;
+		    fastcgi_param SCRIPT_NAME /framework/main.php;
+		    fastcgi_param QUERY_STRING url=$uri&$args;
+		}
+
+		location ~* \.php$ {
+		    fastcgi_keep_conn on;
+		    fastcgi_split_path_info ^(.+\.php)(/.+)$;
+		    fastcgi_pass unix:/var/run/php5-fpm.sock;
+		    fastcgi_index index.php;
+        include fastcgi_params;
+		    fastcgi_read_timeout 120;
+		    fastcgi_connect_timeout 60;
+		    fastcgi_send_timeout 120;
+		    fastcgi_buffer_size 64k;
+		    fastcgi_buffers 4 65k;
+		    fastcgi_busy_buffers_size 128k;
+		}
+
+		# Deny access to silverstripe-cache
+		location ~ ^/silverstripe-cache {
+		    deny all;
+		}
+
+		# Deny access to logs
+		location ~ ^/logs {
+		    deny all;
+		}
+
+		# Don't execute scripts in the assets folder
+		location ^~ /assets/ {
+		    sendfile on;
+		    try_files $uri $uri/ =404;
+		}
+
+		# Deny access to composer
+		location ~ ^/(vendor|composer.json|composer.lock) {
+		    deny all;
+		}
+
+		# Deny access to yaml files
+		location ~ \.yml$ {
+		    deny all;
+		}
+
+		# Deny access to template files
+		location ~ \.ss$ {
+		    satisfy any;
+		    allow 127.0.0.1;
+		    deny all;
+		}
+
+		# CMS & Framework .htaccess rules
+		location ~ ^/(cms|framework|mysite)/.*\.(php|php[345]|phtml|inc)$ {
+		    deny all;
+		}
+		location ~ ^/(cms|framework)/silverstripe_version$ {
+		    deny all;
+		}
+		location ~ ^/framework/.*(main|static-main|rpc|tiny_mce_gzip)\.php$ {
+		    allow all;
+		}
+
+		# Deny access to all dot files
+		location ~ /\. {
+		        deny all;
+		}
+
+		# Enable browser cache for static files and don't log them
+		location ~* ^.+.(htm|html|jpg|jpeg|gif|png|svg|ico|css|zip|tgz|gz|rar|bz2|doc|docx|xls|xlsx|pdf|ppt|pptx|txt|tar|mid|midi|wav|bmp|rtf|js)$ {
+		        access_log off;
+		        expires max;
+		}
+
+}
