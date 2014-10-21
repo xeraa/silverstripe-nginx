@@ -36,7 +36,7 @@ Vagrant.configure(2) do |config|
 
 
   # Expose the SilverStripe folder to the host
-  config.vm.synced_folder "source/", "/var/www/silverstripe-nginx"
+  config.vm.synced_folder "source/", "/var/www/silverstripe-nginx", create: true
 
 
 end

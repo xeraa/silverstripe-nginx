@@ -21,6 +21,10 @@ If you can successfully run ``$ vagrant -v`` you are most likely good to continu
 Open your shell and change to the base folder of this project where the *Vagrantfile* is located.
 Run ``$ vagrant up`` and it will pull down Ubuntu 14.04, install all required dependencies, and install the latest stable SilverStripe version.
 
+The source code of your installation will be available inside the project's base folder under *source/*.
+
+You can access the database at *127.0.0.1:8889/silverstripe* with the username *root* and the password *root*.
+
 
 ## How do you make sure it works?
 
